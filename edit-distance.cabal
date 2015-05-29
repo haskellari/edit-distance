@@ -1,5 +1,5 @@
 Name:                edit-distance
-Version:             0.2.1.2
+Version:             0.2.1.3
 Cabal-Version:       >= 1.2
 Category:            Algorithms
 Synopsis:            Levenshtein and restricted Damerau-Levenshtein edit distances
@@ -33,24 +33,24 @@ Library
                                 Text.EditDistance.Bits
                                 Text.EditDistance.MonadUtilities
                                 Text.EditDistance.ArrayUtilities
-        
+
         if flag(splitBase)
                 Build-Depends:  base >= 3 && < 5, array >= 0.1, random >= 1.0, containers >= 0.1.0.1
         else
                 Build-Depends:  base < 3
-        
+
         Ghc-Options:            -O2
 
 Executable edit-distance-tests
         Main-Is:                Text/EditDistance/Tests.hs
-        
+
         Extensions:             PatternGuards, PatternSignatures,
                                 ScopedTypeVariables
         Ghc-Options:            -O2
-        
+
         if !flag(tests)
                 Buildable:      False
-        else            
+        else
                 Build-Depends:          test-framework >= 0.1.1, QuickCheck >= 1.1 && < 2.0, test-framework-quickcheck
                 if flag(splitBase)
                         Build-Depends:  base >= 3 && < 5, array >= 0.1, random >= 1.0
@@ -59,7 +59,7 @@ Executable edit-distance-tests
 
 Executable edit-distance-benchmark
         Main-Is:                Text/EditDistance/Benchmark.hs
-        
+
         if !flag(benchmark)
                 Buildable:      False
         else
@@ -69,5 +69,5 @@ Executable edit-distance-benchmark
                 else
                         Build-Depends:  base < 3,
                                         deepseq >= 1.2, unix >= 2.3
-            
+
         Ghc-Options:            -O2
