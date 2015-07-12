@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards, PatternSignatures, ScopedTypeVariables, BangPatterns, Rank2Types #-}
+{-# LANGUAGE PatternGuards, ScopedTypeVariables, BangPatterns, Rank2Types #-}
 
 module Text.EditDistance.Bits (
         levenshteinDistance, levenshteinDistanceWithLengths, {-levenshteinDistanceCutoff,-} restrictedDamerauLevenshteinDistance, restrictedDamerauLevenshteinDistanceWithLengths
@@ -52,7 +52,7 @@ levenshteinDistanceWithLengths !m !n str1 str2
 {-# SPECIALIZE levenshteinDistance' :: Word64 -> Int -> Int -> String -> String -> Int #-}
 {-# SPECIALIZE levenshteinDistance' :: Integer -> Int -> Int -> String -> String -> Int #-}
 levenshteinDistance' :: (Num bv, Bits bv) => bv -> Int -> Int -> String -> String -> Int
-levenshteinDistance' (_bv_dummy :: bv) !m !n str1 str2 
+levenshteinDistance' (_bv_dummy :: bv) !m !n str1 str2
   | [] <- str1 = n
   | otherwise  = extractAnswer $ foldl'3k (levenshteinDistanceWorker (matchVectors str1) top_bit_mask vector_mask) (m_ones, 0, m) str2
   where m_ones@vector_mask = (2 ^ m) - 1
@@ -75,16 +75,16 @@ levenshteinDistanceWorker !str1_mvs !top_bit_mask !vector_mask (!vp, !vn, !dista
                    ,"distance'' = " ++ show distance'']) -} vp' `seq` vn' `seq` distance'' `seq` k (vp', vn', distance'')
   where
     pm' = IM.findWithDefault 0 (ord char2) str1_mvs
-    
+
     d0' = ((((pm' .&. vp) + vp) .&. vector_mask) `xor` vp) .|. pm' .|. vn
     hp' = vn .|. sizedComplement vector_mask (d0' .|. vp)
     hn' = d0' .&. vp
-    
+
     hp'_shift = ((hp' `shiftL` 1) .|. 1) .&. vector_mask
     hn'_shift = (hn' `shiftL` 1) .&. vector_mask
     vp' = hn'_shift .|. sizedComplement vector_mask (d0' .|. hp'_shift)
     vn' = d0' .&. hp'_shift
-    
+
     distance' = if hp' .&. top_bit_mask /= 0 then distance + 1 else distance
     distance'' = if hn' .&. top_bit_mask /= 0 then distance' - 1 else distance'
 
@@ -96,12 +96,12 @@ levenshteinDistanceWorker !str1_mvs !top_bit_mask !vector_mask (!vp, !vn, !dista
 -- Based on the algorithm presented in "A Bit-Vector Algorithm for Computing Levenshtein and Damerau Edit Distances" in PSC'02 (Heikki Hyyro).
 -- See http://www.cs.uta.fi/~helmu/pubs/psc02.pdf and http://www.cs.uta.fi/~helmu/pubs/PSCerr.html for an explanation
 levenshteinDistanceCutoff :: Int -> String -> String -> Int
-levenshteinDistanceCutoff cutoff str1 str2 
+levenshteinDistanceCutoff cutoff str1 str2
   | length str1 <= length str2 = levenshteinDistanceCutoff' cutoff str1 str2
   | otherwise = levenshteinDistanceCutoff' cutoff str2 str1
 
 levenshteinDistanceCutoff' :: Int -> String -> String -> Int
-levenshteinDistanceCutoff' cutoff str1 str2 
+levenshteinDistanceCutoff' cutoff str1 str2
   | [] <- str1 = n
   | otherwise  = extractAnswer $ foldl' (levenshteinDistanceCutoffFlatWorker (matchVectors str1))
                                     (foldl' (levenshteinDistanceCutoffDiagWorker (matchVectors str1)) (top_bit_mask, vector_mask, all_ones, 0, initial_pm_offset, initial_dist) str2_diag)
@@ -114,19 +114,19 @@ levenshteinDistanceCutoff' cutoff str1 str2
         all_ones@vector_mask = (2 ^ vector_length) - 1
         top_bit_mask = trace (show bottom_factor ++ ", " ++ show vector_length) $ 1 `shiftL` (vector_length - 1)
         extractAnswer (_, _, _, _, _, distance) = distance
-        
+
         len_difference = n - m
         top_factor = cutoff + len_difference
         bottom_factor = cutoff - len_difference
         bottom_factor_shift = (bottom_factor `shiftR` 1)
-        
+
         initial_dist = bottom_factor_shift               -- The distance the virtual first vector ended on
         initial_pm_offset = (top_factor `shiftR` 1)      -- The amount of left shift to apply to the >next< pattern match vector
         diag_threshold = negate bottom_factor_shift + m  -- The index in str2 where we stop going diagonally down and start going across
         (str2_diag, str2_flat) = splitAt diag_threshold str2
 
 levenshteinDistanceCutoffDiagWorker :: IM.IntMap BitVector -> (BitVector, BitVector, BitVector, BitVector, Int, Int) -> Char -> (BitVector, BitVector, BitVector, BitVector, Int, Int)
-levenshteinDistanceCutoffDiagWorker !str1_mvs (!top_bit_mask, !vector_mask, !vp, !vn, !pm_offset, !distance) !char2 
+levenshteinDistanceCutoffDiagWorker !str1_mvs (!top_bit_mask, !vector_mask, !vp, !vn, !pm_offset, !distance) !char2
   = trace (unlines ["vp = " ++ show vp
                    ,"vn = " ++ show vn
                    ,"vector_mask = " ++ show vector_mask
@@ -142,19 +142,19 @@ levenshteinDistanceCutoffDiagWorker !str1_mvs (!top_bit_mask, !vector_mask, !vp,
   where
     unshifted_pm = IM.findWithDefault 0 (ord char2) str1_mvs
     pm' = (unshifted_pm `shift` pm_offset) .&. vector_mask
-    
+
     d0' = ((((pm' .&. vp) + vp) .&. vector_mask) `xor` vp) .|. pm' .|. vn
     hp' = vn .|. sizedComplement vector_mask (d0' .|. vp)
     hn' = d0' .&. vp
-    
+
     d0'_shift = d0' `shiftR` 1
     vp' = hn' .|. sizedComplement vector_mask (d0'_shift .|. hp')
     vn' = d0'_shift .&. hp'
-    
+
     distance' = if d0' .&. top_bit_mask /= 0 then distance else distance + 1
 
 levenshteinDistanceCutoffFlatWorker :: IM.IntMap BitVector -> (BitVector, BitVector, BitVector, BitVector, Int, Int) -> Char -> (BitVector, BitVector, BitVector, BitVector, Int, Int)
-levenshteinDistanceCutoffFlatWorker !str1_mvs (!top_bit_mask, !vector_mask, !vp, !vn, !pm_offset, !distance) !char2 
+levenshteinDistanceCutoffFlatWorker !str1_mvs (!top_bit_mask, !vector_mask, !vp, !vn, !pm_offset, !distance) !char2
   = trace (unlines ["pm_offset = " ++ show pm_offset
                    ,"top_bit_mask' = " ++ show top_bit_mask'
                    ,"vector_mask' = " ++ show vector_mask'
@@ -170,15 +170,15 @@ levenshteinDistanceCutoffFlatWorker !str1_mvs (!top_bit_mask, !vector_mask, !vp,
     top_bit_mask' = top_bit_mask `shiftR` 1
     vector_mask' = vector_mask `shiftR` 1
     pm' = (IM.findWithDefault 0 (ord char2) str1_mvs `rotate` pm_offset) .&. vector_mask'
-    
+
     d0' = ((((pm' .&. vp) + vp) `xor` vp) .|. pm' .|. vn) .&. vector_mask'
     hp' = vn .|. sizedComplement vector_mask' (d0' .|. vp)
     hn' = d0' .&. vp
-    
+
     d0'_shift = d0' `shiftR` 1
     vp' = hn' .|. sizedComplement vector_mask' (d0'_shift .|. hp')
     vn' = d0'_shift .&. hp'
-    
+
     distance' = if hp' .&. top_bit_mask' /= 0 then distance + 1 else distance
     distance'' = if hn' .&. top_bit_mask' /= 0 then distance' - 1 else distance'
 
@@ -204,7 +204,7 @@ restrictedDamerauLevenshteinDistanceWithLengths !m !n str1 str2
 {-# SPECIALIZE restrictedDamerauLevenshteinDistance' :: Word64 -> Int -> Int -> String -> String -> Int #-}
 {-# SPECIALIZE restrictedDamerauLevenshteinDistance' :: Integer -> Int -> Int -> String -> String -> Int #-}
 restrictedDamerauLevenshteinDistance' :: (Num bv, Bits bv) => bv -> Int -> Int -> String -> String -> Int
-restrictedDamerauLevenshteinDistance' (_bv_dummy :: bv) !m !n str1 str2 
+restrictedDamerauLevenshteinDistance' (_bv_dummy :: bv) !m !n str1 str2
   | [] <- str1 = n
   | otherwise  = extractAnswer $ foldl'5k (restrictedDamerauLevenshteinDistanceWorker (matchVectors str1) top_bit_mask vector_mask) (0, 0, m_ones, 0, m) str2
   where m_ones@vector_mask = (2 ^ m) - 1
@@ -218,17 +218,17 @@ restrictedDamerauLevenshteinDistanceWorker !str1_mvs !top_bit_mask !vector_mask 
   = pm' `seq` d0' `seq` vp' `seq` vn' `seq` distance'' `seq` k (pm', d0', vp', vn', distance'')
   where
     pm' = IM.findWithDefault 0 (ord char2) str1_mvs
-    
+
     d0' = ((((sizedComplement vector_mask d0) .&. pm') `shiftL` 1) .&. pm) -- No need to mask the shiftL because of the restricted range of pm
       .|. ((((pm' .&. vp) + vp) .&. vector_mask) `xor` vp) .|. pm' .|. vn
     hp' = vn .|. sizedComplement vector_mask (d0' .|. vp)
     hn' = d0' .&. vp
-    
+
     hp'_shift = ((hp' `shiftL` 1) .|. 1) .&. vector_mask
     hn'_shift = (hn' `shiftL` 1) .&. vector_mask
     vp' = hn'_shift .|. sizedComplement vector_mask (d0' .|. hp'_shift)
     vn' = d0' .&. hp'_shift
-    
+
     distance' = if hp' .&. top_bit_mask /= 0 then distance + 1 else distance
     distance'' = if hn' .&. top_bit_mask /= 0 then distance' - 1 else distance'
 

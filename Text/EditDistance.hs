@@ -1,8 +1,8 @@
 {-# LANGUAGE PatternGuards #-}
 
 -- | Computing the edit distances between strings
-module Text.EditDistance ( 
-        Costs(..), EditCosts(..), defaultEditCosts, 
+module Text.EditDistance (
+        Costs(..), EditCosts(..), defaultEditCosts,
         levenshteinDistance, restrictedDamerauLevenshteinDistance
     ) where
 
@@ -26,8 +26,8 @@ levenshteinDistance costs str1 str2
     str2_len = length str2
 
 -- | Find the \"restricted\" Damerau-Levenshtein edit distance between two strings.  This algorithm calculates the cost of
--- the so-called optimal string alignment, which does not always equal the appropriate edit distance. The cost of the optimal 
--- string alignment is the number of edit operations needed to make the input strings equal under the condition that no substring 
+-- the so-called optimal string alignment, which does not always equal the appropriate edit distance. The cost of the optimal
+-- string alignment is the number of edit operations needed to make the input strings equal under the condition that no substring
 -- is edited more than once.  See also: <http://en.wikipedia.org/wiki/Damerau-Levenshtein_distance>.
 restrictedDamerauLevenshteinDistance :: EditCosts -> String -> String -> Int
 restrictedDamerauLevenshteinDistance costs str1 str2

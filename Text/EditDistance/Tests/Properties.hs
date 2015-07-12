@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards, PatternSignatures, ScopedTypeVariables #-}
+{-# LANGUAGE PatternGuards, ScopedTypeVariables #-}
 
 module Text.EditDistance.Tests.Properties (
         tests
@@ -33,16 +33,16 @@ tests = [ testGroup "Levenshtein Distance (SquareSTUArray)" sqstu_levenshteinDis
     stu_restrictedDamerauLevenshteinDistanceTests   = standardDistanceTests STUArray.restrictedDamerauLevenshteinDistance       interestingCosts (undefined :: ExtendedEditOperation)
     bits_levenshteinDistanceTests                   = standardDistanceTests (const Bits.levenshteinDistance)                    defaultEditCosts (undefined :: BasicEditOperation)
     bits_restrictedDamerauLevenshteinDistanceTests  = standardDistanceTests (const Bits.restrictedDamerauLevenshteinDistance)   defaultEditCosts (undefined :: ExtendedEditOperation)
-    
+
     --bits_levenshteinDistanceCutoffTests = [ testProperty "Cutoff vs. Non-Cutoff" (forAll arbitrary (\cutoff -> distanceEqIfBelowProperty cutoff (Bits.levenshteinDistanceCutoff cutoff) Bits.levenshteinDistance defaultEditCosts (undefined :: BasicEditOperation))) ]
-    
-    levenshteinDistanceCrosscheckTests 
+
+    levenshteinDistanceCrosscheckTests
       = crossCheckTests [ ("SquareSTUArray", SquareSTUArray.levenshteinDistance defaultEditCosts)
                         , ("STUArray",       STUArray.levenshteinDistance defaultEditCosts)
                         , ("Bits",           Bits.levenshteinDistance) ]
                         (undefined :: BasicEditOperation)
-    
-    restrictedDamerauLevenshteinDistanceCrosscheckTests 
+
+    restrictedDamerauLevenshteinDistanceCrosscheckTests
       = crossCheckTests [ ("SquareSTUArray", SquareSTUArray.restrictedDamerauLevenshteinDistance defaultEditCosts)
                         , ("STUArray",       STUArray.restrictedDamerauLevenshteinDistance defaultEditCosts)
                         , ("Bits",           Bits.restrictedDamerauLevenshteinDistance) ]

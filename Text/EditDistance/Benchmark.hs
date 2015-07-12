@@ -1,29 +1,24 @@
 {-# OPTIONS_GHC -fno-full-laziness #-}
 module Main where
 
-import Text.EditDistance.EditCosts
-import Text.EditDistance.MonadUtilities
+import           Text.EditDistance.EditCosts
+import           Text.EditDistance.MonadUtilities
 import qualified Text.EditDistance as BestEffort
 import qualified Text.EditDistance.Bits as Bits
 import qualified Text.EditDistance.STUArray as STUArray
 import qualified Text.EditDistance.SquareSTUArray as SquareSTUArray
 
-import Criterion.Config
-import Criterion.Main
-import System.IO
-import System.Exit
-import System.Environment
---import System.Posix.IO
-import Data.Time.Clock.POSIX (getPOSIXTime)
-import System.Random
-import System.Process
-import System.Mem
-import Data.List
-import Data.Monoid (mempty)
-import Control.Monad
-import Control.Exception
---import Control.Concurrent       ( forkIO, threadDelay )
-import Control.DeepSeq      ( NFData, rnf )
+import           Control.DeepSeq ( NFData, rnf )
+import           Control.Exception
+import           Control.Monad
+import           Criterion.Main
+import           Data.List
+import           Data.Time.Clock.POSIX (getPOSIXTime)
+import           System.Environment
+import           System.Exit
+import           System.Mem
+import           System.Process
+import           System.Random
 
 sTRING_SIZE_STEP, mAX_STRING_SIZE :: Int
 sTRING_SIZE_STEP = 3
@@ -33,7 +28,7 @@ getTime :: IO Double
 getTime = realToFrac `fmap` getPOSIXTime
 
 time :: IO a -> IO Double
-time action = do 
+time action = do
     ts1 <- getTime
     action
     ts2 <- getTime
@@ -48,12 +43,12 @@ sample distance bounds@(i, j) = do
     gen <- newStdGen
     let (string1, string2_long) = splitAt i (randoms gen)
         string2 = take j string2_long
-    
+
     -- Force the two strings to be evaluated so they don't meddle
     -- with the benchmarking
     evaluate (rnf string1)
     evaluate (rnf string2)
-    
+
     -- Don't want junk from previous runs causing a GC during the test
     performGC
 
@@ -100,17 +95,16 @@ main = do
             --sample_fns = [Bits.restrictedDamerauLevenshteinDistance, SquareSTUArray.restrictedDamerauLevenshteinDistance defaultEditCosts, STUArray.restrictedDamerauLevenshteinDistance defaultEditCosts, BestEffort.restrictedDamerauLevenshteinDistance defaultEditCosts]
         sampless <- forM sample_fns $ \sample_fn -> augment (sample sample_fn) sample_range
         let listified_samples = foldr1 joinOnKey sampless
-        
+
         writeFile "data.plot" (toGnuPlotFormat listified_samples)
         writeFile "plot.script" (gnuPlotScript sample_titles)
-        
+
         (_inp, _outp, _err, gp_pid) <- runInteractiveCommand "(cat plot.script | gnuplot); RETCODE=$?; rm plot.script; exit $RETCODE"
         gp_exit_code <- waitForProcess gp_pid
         case gp_exit_code of
                 ExitSuccess -> putStrLn "Plotted at 'data.ps'"
-                ExitFailure err_no -> putStrLn $ "Failed! Error code " ++ show err_no    
+                ExitFailure err_no -> putStrLn $ "Failed! Error code " ++ show err_no
       _ -> do
         let mkBench n m name f = bench name $ whnf (uncurry f) (replicate n 'a', replicate m 'b')
-            cfg = mempty { cfgSamples = ljust 500 }
-        defaultMainWith cfg (return ()) [bgroup (show (n, m)) (zipWith (mkBench n m) sample_titles sample_fns)
-                                        | (n, m) <- [(32, 32), (32, mAX_STRING_SIZE), (mAX_STRING_SIZE, 32), (mAX_STRING_SIZE, mAX_STRING_SIZE)]]
+        defaultMain [ bgroup (show (n, m)) (zipWith (mkBench n m) sample_titles sample_fns)
+                    | (n, m) <- [(32, 32), (32, mAX_STRING_SIZE), (mAX_STRING_SIZE, 32), (mAX_STRING_SIZE, mAX_STRING_SIZE)]]
