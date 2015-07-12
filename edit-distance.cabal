@@ -1,5 +1,5 @@
 name:                edit-distance
-version:             0.2.1.3
+version:             0.2.2.0
 cabal-version:       >= 1.2
 category:            Algorithms
 synopsis:            Levenshtein and restricted Damerau-Levenshtein edit distances
@@ -30,7 +30,7 @@ test-suite edit-distance-tests
                           Text.EditDistance.Tests.Properties
   type:                   exitcode-stdio-1.0
   extensions:             PatternGuards, ScopedTypeVariables
-  ghc-options:            -O2
+  ghc-options:            -O2 -Wall
   build-depends:          base >= 4.5 && < 5, array >= 0.1, random >= 1.0,
                           test-framework >= 0.1.1, QuickCheck >= 2.4 && <2.9, test-framework-quickcheck2
 
