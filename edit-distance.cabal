@@ -8,6 +8,7 @@ license:             BSD3
 license-File:        LICENSE
 extra-source-files:  README.md
 author:              Max Bolingbroke <batterseapower@hotmail.com>
+copyright:           (c) 2008-2013 Maximilian Bolinbroke
 maintainer:          Oleg Grenrus <oleg.grenrus@iki.fi>
 homepage:            http://github.com/phadej/edit-distance
 build-type:          Simple

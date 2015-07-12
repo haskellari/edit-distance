@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, Trustworthy #-}
 
 module Text.EditDistance.ArrayUtilities (
     unsafeReadArray, unsafeWriteArray,
@@ -10,7 +10,7 @@ import Control.Monad (forM_)
 import Control.Monad.ST
 
 import Data.Array.ST
-import Data.Array.Base (unsafeRead, unsafeWrite, getNumElements)
+import Data.Array.Base (unsafeRead, unsafeWrite)
 
 #ifdef __GLASGOW_HASKELL__
 import GHC.Arr (unsafeIndex)

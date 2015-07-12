@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards, ScopedTypeVariables, BangPatterns #-}
+{-# LANGUAGE PatternGuards, ScopedTypeVariables, BangPatterns, Trustworthy #-}
 
 module Text.EditDistance.SquareSTUArray (
         levenshteinDistance, levenshteinDistanceWithLengths, restrictedDamerauLevenshteinDistance, restrictedDamerauLevenshteinDistanceWithLengths

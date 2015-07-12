@@ -20,7 +20,7 @@ import qualified Data.IntMap as IM
 foldl'3k :: (forall res. (a, b, c) -> x -> ((a, b, c) -> res) -> res)
          -> (a, b, c) -> [x] -> (a, b, c)
 foldl'3k f = go
-  where go (!a, !b, !c) _      | False = undefined
+  where go (!_, !_, !_) _      | False = undefined
         go ( a,  b,  c) []     = (a, b, c)
         go ( a,  b,  c) (x:xs) = f (a, b, c) x $ \abc -> go abc xs
 
@@ -28,7 +28,7 @@ foldl'3k f = go
 foldl'5k :: (forall res. (a, b, c, d, e) -> x -> ((a, b, c, d, e) -> res) -> res)
          -> (a, b, c, d, e) -> [x] -> (a, b, c, d, e)
 foldl'5k f = go
-  where go (!a, !b, !c, !d, !e) _      | False = undefined
+  where go (!_, !_, !_, !_, !_) _      | False = undefined
         go ( a,  b,  c,  d,  e) []     = (a, b, c, d, e)
         go ( a,  b,  c,  d,  e) (x:xs) = f (a, b, c, d, e) x $ \abcde -> go abcde xs
 

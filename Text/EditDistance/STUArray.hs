@@ -31,17 +31,17 @@ levenshteinDistanceST !costs !str1_len !str2_len str1 str2 = do
     -- Create array of costs for a single row. Say we index costs by (i, j) where i is the column index and j the row index.
     -- Rows correspond to characters of str2 and columns to characters of str1. We can get away with just storing a single
     -- row of costs at a time, but we use two because it turns out to be faster
-    cost_row  <- newArray_ (0, str1_len) :: ST s (STUArray s Int Int)
-    cost_row' <- newArray_ (0, str1_len) :: ST s (STUArray s Int Int)
+    start_cost_row  <- newArray_ (0, str1_len) :: ST s (STUArray s Int Int)
+    start_cost_row' <- newArray_ (0, str1_len) :: ST s (STUArray s Int Int)
 
     read_str1 <- unsafeReadArray' str1_array
     read_str2 <- unsafeReadArray' str2_array
 
      -- Fill out the first row (j = 0)
-    _ <- (\f -> foldM f (1, 0) str1) $ \(i, deletion_cost) col_char -> let deletion_cost' = deletion_cost + deletionCost costs col_char in unsafeWriteArray cost_row i deletion_cost' >> return (i + 1, deletion_cost')
+    _ <- (\f -> foldM f (1, 0) str1) $ \(i, deletion_cost) col_char -> let deletion_cost' = deletion_cost + deletionCost costs col_char in unsafeWriteArray start_cost_row i deletion_cost' >> return (i + 1, deletion_cost')
 
     -- Fill out the remaining rows (j >= 1)
-    (_, final_row, _) <- (\f -> foldM f (0, cost_row, cost_row') [1..str2_len]) $ \(!insertion_cost, !cost_row, !cost_row') !j -> do
+    (_, final_row, _) <- (\f -> foldM f (0, start_cost_row, start_cost_row') [1..str2_len]) $ \(!insertion_cost, !cost_row, !cost_row') !j -> do
         row_char <- read_str2 j
 
         -- Initialize the first element of the row (i = 0)
