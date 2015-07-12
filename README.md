@@ -17,8 +17,8 @@ cabal install
 
 Edit distances algorithms for fuzzy matching. Specifically, this library provides:
 
-* [Levenshtein distance](http://en.wikipedia.org/wiki/Levenshtein_distance)
-* [Restricted Damerau-Levenshtein distance":http://en.wikipedia.org/wiki/Damerau-Levenshtein_distance)
+- [Levenshtein distance](http://en.wikipedia.org/wiki/Levenshtein_distance)
+- [Restricted Damerau-Levenshtein distance](http://en.wikipedia.org/wiki/Damerau-Levenshtein_distance)
 
 They have been fairly heavily optimized. Indeed, for situations where one of
 the strings is under 64 characters long we use a rather neat "bit vector"
