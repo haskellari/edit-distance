@@ -11,7 +11,7 @@ import qualified Text.EditDistance.Bits as Bits
 import Text.EditDistance.Tests.EditOperationOntology
 
 import Test.Framework
-import Test.Framework.Providers.QuickCheck
+import Test.Framework.Providers.QuickCheck2
 import Test.QuickCheck
 
 

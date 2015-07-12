@@ -1,24 +1,17 @@
+{-# LANGUAGE PatternGuards #-}
 module Text.EditDistance.Tests.EditOperationOntology where
 
 import Text.EditDistance.EditCosts
 
 import Test.QuickCheck
-import System.Random
 import Control.Monad
-import Data.Char
-
-
-instance Arbitrary Char where
-    arbitrary     = choose ('\32', '\128')
-    coarbitrary c = variant (ord c `rem` 4)
-
 
 class Arbitrary ops => EditOperation ops where
     edit :: String -> ops -> Gen (String, EditCosts -> Int)
     containsTransposition :: ops -> Bool
 
 instance EditOperation op => EditOperation [op] where
-   edit xs ops = foldM (\(xs, cost) op -> fmap (\(xs', cost') -> (xs', \ecs -> cost ecs + cost' ecs)) $ edit xs op) (xs, const 0) ops
+   edit ys ops = foldM (\(xs, c) op -> fmap (\(xs', cost') -> (xs', \ecs -> c ecs + cost' ecs)) $ edit xs op) (ys, const 0) ops
    containsTransposition = any containsTransposition
 
 
@@ -26,7 +19,7 @@ data EditedString ops = MkEditedString {
     oldString :: String,
     newString :: String,
     operations :: ops,
-    cost :: EditCosts -> Int
+    esCost :: EditCosts -> Int
 }
 
 instance Show ops => Show (EditedString ops) where
@@ -41,7 +34,7 @@ instance EditOperation ops => Arbitrary (EditedString ops) where
             oldString = old_string,
             newString = new_string,
             operations = edit_operations,
-            cost = cost
+            esCost = cost
         }
 
 
@@ -56,11 +49,10 @@ instance Arbitrary ExtendedEditOperation where
 
 instance EditOperation ExtendedEditOperation where
     edit str op = do
-        gen <- rand
         let max_split_ix | Transposition <- op = length str - 1
                          | otherwise           = length str
-            (split_ix, _) = randomR (1, max_split_ix) gen
-            (str_l, str_r) = splitAt split_ix str
+        split_ix <- choose (1, max_split_ix)
+        let (str_l, str_r) = splitAt split_ix str
             non_null = not $ null str
             transposable = length str > 1
         case op of
