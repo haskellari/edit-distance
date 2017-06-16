@@ -2,6 +2,8 @@
 *.plot
 *.ps
 dist
+dist-newstyle
+.ghc.environment.*
 .DS_Store
 .cabal-sandbox
 cabal.sandbox.config
