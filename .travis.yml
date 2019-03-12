@@ -4,6 +4,8 @@
 #
 # For more information, see https://github.com/haskell-CI/haskell-ci
 #
+# version: 0.3
+#
 language: c
 dist: xenial
 
@@ -32,8 +34,8 @@ before_cache:
 
 matrix:
   include:
-    - compiler: "ghc-8.6.3"
-      addons: {apt: {packages: [ghc-ppa-tools,cabal-install-2.4,ghc-8.6.3], sources: [hvr-ghc]}}
+    - compiler: "ghc-8.6.4"
+      addons: {apt: {packages: [ghc-ppa-tools,cabal-install-2.4,ghc-8.6.4], sources: [hvr-ghc]}}
     - compiler: "ghc-8.4.4"
       addons: {apt: {packages: [ghc-ppa-tools,cabal-install-2.4,ghc-8.4.4], sources: [hvr-ghc]}}
     - compiler: "ghc-8.2.2"
@@ -55,7 +57,7 @@ before_install:
   - unset CC
   - CABAL=/opt/ghc/bin/cabal
   - CABALHOME=$HOME/.cabal
-  - "export PATH=\"$CABALHOME/bin:$PATH\""
+  - export PATH="$CABALHOME/bin:$PATH"
   - ROOTDIR=$(pwd)
   - HCNUMVER=$(( $(${HC} --numeric-version|sed -E 's/([0-9]+)\.([0-9]+)\.([0-9]+).*/\1 * 10000 + \2 * 100 + \3/') ))
   - echo $HCNUMVER
@@ -67,7 +69,7 @@ install:
   - BENCH=--enable-benchmarks
   - GHCHEAD=${GHCHEAD-false}
   - travis_retry ${CABAL} update -v
-  - "sed -i.bak 's/^jobs:/-- jobs:/' $CABALHOME/config"
+  - sed -i.bak 's/^jobs:/-- jobs:/' $CABALHOME/config
   - rm -fv cabal.project cabal.project.local
   - grep -Ev -- '^\s*--' $CABALHOME/config | grep -Ev '^\s*$'
   - rm -f cabal.project
@@ -109,9 +111,9 @@ script:
 
   # build & run tests, build benchmarks
   - ${CABAL} new-build -w ${HC} ${TEST} ${BENCH} all
-  - if [ "x$TEST" = "x--enable-tests" ]; then ${CABAL} new-test -w ${HC} ${TEST} ${BENCH} all; fi
+  - ${CABAL} new-test -w ${HC} ${TEST} ${BENCH} all
 
-  # ${CABAL} check
+  # cabal check
   - (cd edit-distance-* && ${CABAL} check)
 
   # haddock
