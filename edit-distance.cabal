@@ -17,7 +17,15 @@ maintainer:         Oleg Grenrus <oleg.grenrus@iki.fi>
 homepage:           http://github.com/phadej/edit-distance
 build-type:         Simple
 tested-with:
-  GHC ==8.6.4 || ==8.4.4 || ==8.2.2 || ==8.0.2 || ==7.10.3 || ==7.8.4 || ==7.6.3 || ==7.4.2
+  GHC ==7.4.2
+   || ==7.6.3
+   || ==7.8.4
+   || ==7.10.3
+   || ==8.0.2
+   || ==8.2.2
+   || ==8.4.4
+   || ==8.6.5
+   || ==8.8.1
 
 library
   default-language: Haskell98
