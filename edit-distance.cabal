@@ -25,7 +25,8 @@ tested-with:
    || ==8.2.2
    || ==8.4.4
    || ==8.6.5
-   || ==8.8.1
+   || ==8.8.3
+   || ==8.10.1
 
 library
   default-language: Haskell98
@@ -35,8 +36,8 @@ library
     Text.EditDistance.Bits
     Text.EditDistance.EditCosts
     Text.EditDistance.MonadUtilities
-    Text.EditDistance.STUArray
     Text.EditDistance.SquareSTUArray
+    Text.EditDistance.STUArray
 
   build-depends:
       array       >=0.1
