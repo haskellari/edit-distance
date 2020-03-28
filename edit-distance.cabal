@@ -60,7 +60,7 @@ test-suite edit-distance-tests
       array                       >=0.1
     , base                        >=4.5     && <5
     , containers                  >=0.1.0.1
-    , QuickCheck                  >=2.4     && <2.14
+    , QuickCheck                  >=2.4     && <2.15
     , random                      >=1.0
     , test-framework              >=0.1.1
     , test-framework-quickcheck2
