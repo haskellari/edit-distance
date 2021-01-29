@@ -27,8 +27,7 @@ import qualified Text.EditDistance.SquareSTUArray as SquareSTUArray
 levenshteinDistance :: EditCosts -> String -> String -> Int
 levenshteinDistance costs str1 str2
   | isDefaultEditCosts costs
-  , (str1_len <= 64) == (str2_len <= 64)                             -- The Integer implementation of the Bits algorithm is quite inefficient, but scales better than the
-  = Bits.levenshteinDistanceWithLengths str1_len str2_len str1 str2  -- STUArrays if both string lengths > 64. The Word64 implementation is always better, if it is applicable
+  = Bits.levenshteinDistanceWithLengths str1_len str2_len str1 str2 
   | otherwise
   = SquareSTUArray.levenshteinDistanceWithLengths costs str1_len str2_len str1 str2 -- SquareSTUArray usually beat making more use of the heap with STUArray
   where
@@ -42,8 +41,7 @@ levenshteinDistance costs str1 str2
 restrictedDamerauLevenshteinDistance :: EditCosts -> String -> String -> Int
 restrictedDamerauLevenshteinDistance costs str1 str2
   | isDefaultEditCosts costs
-  , (str1_len <= 64) == (str2_len <= 64)                                             -- The Integer implementation of the Bits algorithm is quite inefficient, but scales better than the
-  = Bits.restrictedDamerauLevenshteinDistanceWithLengths str1_len str2_len str1 str2 -- STUArrays if both string lengths > 64. The Word64 implementation is always better, if it is applicable
+  = Bits.restrictedDamerauLevenshteinDistanceWithLengths str1_len str2_len str1 str2
   | otherwise
   = SquareSTUArray.restrictedDamerauLevenshteinDistanceWithLengths costs str1_len str2_len str1 str2 -- SquareSTUArray usually beat making more use of the heap with STUArray
   where
